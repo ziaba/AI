@@ -2,28 +2,46 @@ import heapq
 
 class Dijkstra(object):
 
-    def __init__(self):
-        self.numberOfIteration = 0
-        self.verticlesToBeCalculated = []
-
-    def findShortestPath(self, verticlesList, startingVertex):
+    def findShortestPath(self, startingVertex):
+        candidates = []
         startingVertex.minimumDistance = 0
-        heapq.heappush(self.verticlesToBeCalculated, startingVertex)
+        heapq.heappush(candidates, startingVertex)
 
-        while len(self.verticlesToBeCalculated) > 0:
-
-            checkedVertex = heapq.heappop(self.verticlesToBeCalculated)
-
+        while len(candidates) > 0:
+            checkedVertex = heapq.heappop(candidates)
             for edge in checkedVertex.adjacentEdges:
-                newDistance = checkedVertex.minimumDistance + edge.length
-                if newDistance < edge.endVertex.minimumDistance:
-                    edge.endVertex.predecessor = checkedVertex
-                    heapq.heappush(edge.endVertex)
-            self.printIteration()
+                if self.__isCheckedVertexCanditate(checkedVertex, edge):
 
-    def printIteration(self):
-        self. numberOfIteration += 1
-        print('Dijkstra iteration: {}'.format(self.numberOfIteration))
-        for vertex in self.verticlesToBeCalculated:
-            print('Name:{}, value: {}'.format(vertex.name, vertex.minimumDistance))
+                    if self.isDirectionConsistent:
+                        edge.endVertex.predecessor = checkedVertex
+                        edge.endVertex.minimumDistance = self.__calculateNewDistance(checkedVertex, edge.length)
+                        heapq.heappush(candidates, edge.endVertex)
 
+                    else:
+                        edge.startVertex.predecessor = checkedVertex
+                        edge.startVertex.minimumDistance = self.__calculateNewDistance(checkedVertex, edge.length)
+                        heapq.heappush(candidates, edge.startVertex)
+
+    def __isCheckedVertexCanditate(self, checkedVertex, edge):
+        return self.__calculateNewDistance(checkedVertex, edge.length) < self.__calculateOldDistance(checkedVertex, edge)
+
+    def __calculateNewDistance(self, checkedVertex, edgeLength):
+        return checkedVertex.minimumDistance + edgeLength
+
+    def __calculateOldDistance(self, checkedVertex, edge):
+        if checkedVertex == edge.endVertex:
+            self.isDirectionConsistent = False
+            return edge.startVertex.minimumDistance
+        else:
+            self.isDirectionConsistent = True
+            return edge.endVertex.minimumDistance
+
+    def getShortestPath(self, startVertex, finalVertex):
+        shortestPath=[]
+        shortestPath.append(finalVertex)
+
+        predecesor = finalVertex.predecessor
+        while (predecesor != None) and (predecesor != startVertex):
+            shortestPath.append(predecesor)
+            predecesor = predecesor.predecessor
+        return shortestPath

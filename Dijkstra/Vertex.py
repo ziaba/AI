@@ -3,7 +3,7 @@ from math import inf
 
 class Vertex(object):
 
-    def __init__(self, vertexName, adjacentVertices):
+    def __init__(self, vertexName):
         self.name = vertexName
         self.predecessor = None
         self.adjacentEdges = []
@@ -15,3 +15,9 @@ class Vertex(object):
 
     def __lt__(self, other):
         return self.minimumDistance < other.minimumDistance
+
+    def __str__(self):
+        if self.predecessor == None:
+            return "{} with minimum distance: {}".format(self.name, self.minimumDistance)
+        else:
+            return "{} -> {} with minimum distance: {}".format(self.predecessor.name, self.name, self.minimumDistance)
